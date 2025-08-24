@@ -2,7 +2,6 @@ package Vehicle.example.Management.Controller;
 
 import Vehicle.example.Management.List.UserList;
 import Vehicle.example.Management.Service.ServiceClass;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,26 +15,30 @@ import java.util.List;
 public class ControllerClass {
 
     @Autowired
-    private ServiceClass service;
+    private ServiceClass userService;
 
-    @RequestMapping("/Hello")
-    public String greet(){
-        return "Hello";
+    @GetMapping("/users")
+    public ResponseEntity<List<UserList>> getUsers() {
+        return new ResponseEntity<>(userService.getList(), HttpStatus.OK);
     }
 
-    @RequestMapping("/Lists")
-    public ResponseEntity<List<UserList>> getlist(){
-        return new ResponseEntity<>(service.getlist() , HttpStatus.OK);
+    @GetMapping("/user/{id}")
+    public ResponseEntity<UserList> getUserById(@PathVariable int id) {
+        UserList user = userService.getUserById(id);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @RequestMapping("/User/{id}")
-    public ResponseEntity<UserList>getlistbyid(@PathVariable int id)
-    {
-        UserList lists=service.getlistbyid(id);
-        if(lists!=null)
-            return new ResponseEntity<>(lists,HttpStatus.OK);
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserList loginRequest) {
+        UserList user = userService.login(loginRequest.getName(), loginRequest.getPassword());
 
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
+        }
     }
 }

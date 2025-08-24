@@ -18,11 +18,22 @@ public class UserList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private String password;
     private String name;
     private String email;
     private long phone;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dateofbirth;
+
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 
     public int getId() {
         return id;
