@@ -20,20 +20,28 @@ public class UserList {
     private int id;
     private String password;
     private String name;
+    private String username;
+    private String address;
+    private String Vehicletype;
+    private String vehiclemodel;
+    @Column(nullable = true)
+    private int yearofmanufacture;
+    private String regno;
     private String email;
     private long phone;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date dateofbirth;
+    private String imageName;
+    private String imageType;
 
 
-    public String getPassword() {
-        return password;
+    public String getUsername() {
+        return username;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUsername(String username) {
+        this.username = username;
     }
-
 
     public int getId() {
         return id;
@@ -43,12 +51,62 @@ public class UserList {
         this.id = id;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getVehicletype() {
+        return Vehicletype;
+    }
+
+    public void setVehicletype(String vehicletype) {
+        Vehicletype = vehicletype;
+    }
+
+    public String getVehiclemodel() {
+        return vehiclemodel;
+    }
+
+    public void setVehiclemodel(String vehiclemodel) {
+        this.vehiclemodel = vehiclemodel;
+    }
+
+    public int getYearofmanufacture() {
+        return yearofmanufacture;
+    }
+
+    public void setYearofmanufacture(int yearofmanufacture) {
+        this.yearofmanufacture = yearofmanufacture;
+    }
+
+    public String getRegno() {
+        return regno;
+    }
+
+    public void setRegno(String regno) {
+        this.regno = regno;
     }
 
     public String getEmail() {
@@ -74,4 +132,24 @@ public class UserList {
     public void setDateofbirth(Date dateofbirth) {
         this.dateofbirth = dateofbirth;
     }
-}
+
+    public String getImageName() {
+        return imageName;
+    }
+
+    public void setImageName(String imageName) {
+        this.imageName = imageName;
+    }
+
+    public String getImageType() {
+        return imageType;
+    }
+
+    public void setImageType(String imageType) {
+        this.imageType = imageType;
+    }
+
+
+
+
+    }

@@ -22,7 +22,13 @@ public class ServiceClass {
         return userRepository.findById(id).orElse(null);
     }
 
-    public UserList login(String name, String password) {
-        return userRepository.findByNameAndPassword(name, password);
+    public UserList login(String username, String password) {
+        return userRepository.findByusernameAndPassword(username, password);
     }
+
+    public UserList saveUser(UserList user) {
+        return userRepository.save(user);
+    }
+
+
 }
