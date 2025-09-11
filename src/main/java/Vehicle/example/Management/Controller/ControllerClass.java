@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -80,5 +81,17 @@ public class ControllerClass {
         return ResponseEntity.ok(userService.saveUser(user));
     }
 
+    @PutMapping("/users/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> request) {
+        String username = request.get("username");
+        String newPassword = request.get("newPassword");
 
+        String result = userService.resetPassword(username, newPassword);
+
+        if (result.toLowerCase().contains("successful")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
+    }
 }

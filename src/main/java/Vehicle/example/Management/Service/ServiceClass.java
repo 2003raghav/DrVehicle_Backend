@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ServiceClass {
@@ -30,5 +31,17 @@ public class ServiceClass {
         return userRepository.save(user);
     }
 
+    public String resetPassword(String username, String newPassword) {
+        Optional<UserList> userOptional = userRepository.findByUsername(username); // use instance
 
+        if (userOptional.isPresent()) {
+            UserList user = userOptional.get();
+            user.setPassword(newPassword); // ⚠ plain text for now
+            userRepository.save(user); // use instance
+            return "Password reset successful!";
+        } else {
+            return "User not found with username: " + username;
+        }
+
+    }
 }
