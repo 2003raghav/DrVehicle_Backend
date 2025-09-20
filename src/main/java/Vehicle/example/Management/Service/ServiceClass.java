@@ -44,4 +44,8 @@ public class ServiceClass {
         }
 
     }
+    public Optional<UserList> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
 }

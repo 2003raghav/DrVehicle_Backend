@@ -3,14 +3,20 @@ package Vehicle.example.Management.Controller;
 import Vehicle.example.Management.List.UserList;
 import Vehicle.example.Management.Service.ServiceClass;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -20,34 +26,42 @@ public class ControllerClass {
     @Autowired
     private ServiceClass userService;
 
+    // List all users
     @GetMapping("/users")
     public ResponseEntity<List<UserList>> getUsers() {
-        return new ResponseEntity<>(userService.getList(), HttpStatus.OK);
+        return ResponseEntity.ok(userService.getList());
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<UserList> getUserById(@PathVariable int id) {
-        UserList user = userService.getUserById(id);
-        if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
+    // Get user by username
+    @GetMapping("/users/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        Optional<UserList> userOpt = userService.getUserByUsername(username);
+        if (userOpt.isPresent()) {
+            return ResponseEntity.ok(userOpt.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "User not found"));
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+
+    // Login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserList loginRequest) {
-        UserList user = userService.login(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-        );
-
+        UserList user = userService.login(loginRequest.getUsername(), loginRequest.getPassword());
         if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
+            // Return minimal info + username
+            return ResponseEntity.ok(Map.of(
+                    "username", user.getUsername(),
+                    "name", user.getName()
+            ));
         } else {
-            return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid username or password"));
         }
     }
 
+    // Register
     @PostMapping("/register")
     public ResponseEntity<UserList> registerUser(
             @RequestParam("password") String password,
@@ -60,7 +74,7 @@ public class ControllerClass {
             @RequestParam("regno") String regno,
             @RequestParam("email") String email,
             @RequestParam("phone") long phone,
-            @RequestParam("dateofbirth") String dateofbirth, // Expect dd-MM-yyyy
+            @RequestParam("dateofbirth") String dateofbirth,
             @RequestParam(value = "image", required = false) MultipartFile imageFile
     ) throws IOException {
 
@@ -81,17 +95,30 @@ public class ControllerClass {
         return ResponseEntity.ok(userService.saveUser(user));
     }
 
+    // Forgot password
     @PutMapping("/users/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> request) {
         String username = request.get("username");
         String newPassword = request.get("newPassword");
 
         String result = userService.resetPassword(username, newPassword);
-
         if (result.toLowerCase().contains("successful")) {
             return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
         }
+    }
+
+    // Serve profile image
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
+        Path path = Paths.get("uploads/" + imageName); // adjust your uploads folder
+        Resource resource = new UrlResource(path.toUri());
+        if (!resource.exists()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG) // adjust dynamically if needed
+                .body(resource);
     }
 }

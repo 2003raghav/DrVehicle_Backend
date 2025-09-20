@@ -20,6 +20,7 @@ public class UserList {
     private int id;
     private String password;
     private String name;
+    @Column(unique = true)
     private String username;
     private String address;
     private String Vehicletype;
