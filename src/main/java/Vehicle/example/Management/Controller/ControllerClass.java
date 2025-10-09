@@ -1,7 +1,9 @@
 package Vehicle.example.Management.Controller;
 
+import Vehicle.example.Management.List.ServiceDetails;
 import Vehicle.example.Management.List.UserList;
 import Vehicle.example.Management.Service.ServiceClass;
+import Vehicle.example.Management.Service.ServiceLayer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -25,6 +27,7 @@ public class ControllerClass {
 
     @Autowired
     private ServiceClass userService;
+
 
     // List all users
     @GetMapping("/users")
@@ -109,16 +112,31 @@ public class ControllerClass {
         }
     }
 
-    // Serve profile image
     @GetMapping("/images/{imageName}")
     public ResponseEntity<Resource> getImage(@PathVariable String imageName) throws IOException {
-        Path path = Paths.get("uploads/" + imageName); // adjust your uploads folder
+        Path path = Paths.get(System.getProperty("user.dir"), "uploads", imageName);
         Resource resource = new UrlResource(path.toUri());
-        if (!resource.exists()) {
+        if (!resource.exists() || !resource.isReadable()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+
+        // detect content type dynamically
+        String contentType = "image/jpeg";
+        if(imageName.toLowerCase().endsWith(".png")) contentType = "image/png";
+        else if(imageName.toLowerCase().endsWith(".gif")) contentType = "image/gif";
+
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG) // adjust dynamically if needed
+                .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
     }
+
+
+    @GetMapping("/{username}")
+    public Optional<UserList> getUserServiceDetails(@PathVariable String username) {
+
+        return userService.findByUsername(username);
+    }
+
+
+
 }
