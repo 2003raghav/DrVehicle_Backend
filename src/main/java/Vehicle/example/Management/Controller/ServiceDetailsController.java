@@ -19,12 +19,28 @@ public class ServiceDetailsController {
 
     // Get all services for a user
     @GetMapping("/{username}")
-    public ResponseEntity<List<ServiceDetails>> getServicesByUsername(@PathVariable String username) {
-        List<ServiceDetails> services = serviceDetailsService.getServicesByUsername(username);
-        if (services.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(services);
+    public ResponseEntity<?> getServicesByUsername(@PathVariable String username) {
+        try {
+            List<ServiceDetails> services = serviceDetailsService.getServicesByUsername(username);
+            if (services.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body("No services found for user: " + username);
+            }
+            return ResponseEntity.ok(services);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching services: " + e.getMessage());
         }
-        return ResponseEntity.ok(services);
+    }
+
+    // Add this endpoint to create a service if it doesn't exist
+    @PostMapping("/create")
+    public ResponseEntity<ServiceDetails> createService(@RequestBody ServiceDetails serviceDetails) {
+        try {
+            ServiceDetails savedService = serviceDetailsService.saveService(serviceDetails);
+            return ResponseEntity.ok(savedService);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
-

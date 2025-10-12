@@ -1,12 +1,15 @@
 package Vehicle.example.Management.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,7 +20,7 @@ public class UserList {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String password;
     private String name;
     @Column(unique = true)
@@ -35,6 +38,21 @@ public class UserList {
     private String imageName;
     private String imageType;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("user") // Add this to break the cycle
+    @JsonIgnore // Add this to completely ignore the user in serialization
+    private List<Appointment> appointments;
+
+    public List<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public void setAppointments(List<Appointment> appointments) {
+        this.appointments = appointments;
+    }
+
+
+
 
     public String getUsername() {
         return username;
@@ -44,11 +62,11 @@ public class UserList {
         this.username = username;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -149,7 +167,6 @@ public class UserList {
     public void setImageType(String imageType) {
         this.imageType = imageType;
     }
-
 
 
 

@@ -1,5 +1,6 @@
 package Vehicle.example.Management.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,20 +11,28 @@ import lombok.NoArgsConstructor;
 @Table(name = "provider_list")
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // Add this
 public class ProviderList {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String garagename;
     private String ownername;
+    private String garageaddress;
+    private String password;
+    private String email;
+    private long phoneno;
+    private String specializations;
+    private String availableservices;
 
-    public int getId() {
-        return id;
-    }
+    private String imageName;
+    private String imageType;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    @Lob
+    @Column(name = "image_data")
+    private byte[] imageData;
 
     public String getGaragename() {
         return garagename;
@@ -31,6 +40,14 @@ public class ProviderList {
 
     public void setGaragename(String garagename) {
         this.garagename = garagename;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getOwnername() {
@@ -65,20 +82,20 @@ public class ProviderList {
         this.email = email;
     }
 
-    public long getPhoneno() {
-        return phoneno;
-    }
-
-    public void setPhoneno(long phoneno) {
-        this.phoneno = phoneno;
-    }
-
     public String getSpecializations() {
         return specializations;
     }
 
     public void setSpecializations(String specializations) {
         this.specializations = specializations;
+    }
+
+    public long getPhoneno() {
+        return phoneno;
+    }
+
+    public void setPhoneno(long phoneno) {
+        this.phoneno = phoneno;
     }
 
     public String getAvailableservices() {
@@ -88,16 +105,6 @@ public class ProviderList {
     public void setAvailableservices(String availableservices) {
         this.availableservices = availableservices;
     }
-
-    private String garageaddress;
-    private String password;
-    private String email;
-    private long phoneno;
-    private String specializations;
-    private String availableservices;
-
-    private String imageName;
-    private String imageType;
 
     public String getImageName() {
         return imageName;
@@ -115,4 +122,11 @@ public class ProviderList {
         this.imageType = imageType;
     }
 
+    public byte[] getImageData() {
+        return imageData;
+    }
+
+    public void setImageData(byte[] imageData) {
+        this.imageData = imageData;
+    }
 }

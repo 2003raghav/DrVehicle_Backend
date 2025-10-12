@@ -1,7 +1,6 @@
 package Vehicle.example.Management.Service;
 
 import Vehicle.example.Management.List.ProviderList;
-import Vehicle.example.Management.List.UserList;
 import Vehicle.example.Management.Repository.ProviderRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,35 +16,67 @@ public class ProviderService {
     @Autowired
     private ProviderRepo repo;
 
+    // Get all providers
+    public List<ProviderList> getAllProviders() {
+        return repo.findAll();
+    }
+
+    // Register provider with image
     public ProviderList registerProvider(ProviderList provider, MultipartFile image) throws IOException {
         if (image != null && !image.isEmpty()) {
             provider.setImageName(image.getOriginalFilename());
             provider.setImageType(image.getContentType());
-            // You can store image bytes in DB if you want:
-            // provider.setImageData(image.getBytes());
+            provider.setImageData(image.getBytes());
         }
         return repo.save(provider);
     }
 
-    public List<ProviderList> getList() {
-        return repo.findAll();
-    }
-
+    // Login
     public ProviderList login(String ownername, String password) {
-        Optional<ProviderList> providerOpt = repo.findByOwnernameAndPassword(ownername, password);
-        return providerOpt.orElse(null);
+        return repo.findByOwnernameAndPassword(ownername, password).orElse(null);
+
     }
 
+    // Reset password
     public String resetPassword(String ownername, String newPassword) {
-        Optional<ProviderList> userOptional = repo.findByOwnername(ownername); // use instance
+        Optional<ProviderList> providerOpt = repo.findByOwnername(ownername);
+        if (providerOpt.isPresent()) {
+            ProviderList provider = providerOpt.get();
+            provider.setPassword(newPassword);
+            repo.save(provider);
+            return "Password reset successful";
+        }
+        return "Provider not found";
+    }
 
-        if (userOptional.isPresent()) {
-            ProviderList user = userOptional.get();
-            user.setPassword(newPassword); // ⚠ plain text for now
-            repo.save(user); // use instance
-            return "Password reset successful!";
+    // Get provider by ID
+    public ProviderList getProviderById(int id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    // Update the getProviderImage method
+    public byte[] getProviderImage(int id) {
+        Optional<ProviderList> providerOpt = repo.findById(id);
+        if (providerOpt.isPresent()) {
+            ProviderList provider = providerOpt.get();
+            // Check if image data exists and is not empty
+            if (provider.getImageData() != null && provider.getImageData().length > 0) {
+                return provider.getImageData();
+            }
+        }
+        return null;
+    }
+
+    // Update provider
+    public ProviderList updateProvider(ProviderList provider) {
+        // Check if provider exists
+        Optional<ProviderList> existingProvider = repo.findById(provider.getId());
+        if (existingProvider.isPresent()) {
+            // Save the updated provider
+            return repo.save(provider);
         } else {
-            return "User not found with username: " + ownername;
+            throw new RuntimeException("Provider not found with id: " + provider.getId());
         }
     }
+
 }

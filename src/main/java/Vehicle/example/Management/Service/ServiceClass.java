@@ -19,7 +19,7 @@ public class ServiceClass {
         return userRepository.findAll();
     }
 
-    public UserList getUserById(int id) {
+    public UserList getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
     }
 
@@ -50,5 +50,17 @@ public class ServiceClass {
 
     public Optional<UserList> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+
+    public UserList updateUser(UserList user) {
+        // Check if user exists
+        Optional<UserList> existingUser = userRepository.findById(user.getId());
+        if (existingUser.isPresent()) {
+            // Save the updated user
+            return userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found with id: " + user.getId());
+        }
     }
 }
